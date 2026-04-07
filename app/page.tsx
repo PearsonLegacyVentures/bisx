@@ -1,8 +1,8 @@
 import { Card } from "@/components/ui/card";
-import { getDashboardData, isStale } from "@/lib/market";
+import { getHomepageData, isStale } from "@/lib/market";
 
 export default async function HomePage() {
-  const data = await getDashboardData();
+  const data = await getHomepageData();
 
   return (
     <div className="space-y-6">
@@ -13,6 +13,11 @@ export default async function HomePage() {
           A public market intelligence dashboard focused on clarity. Track latest available close prices,
           filings, and issuer updates from BISX sources.
         </p>
+        {data.sourceMode === "fallback" ? (
+          <p className="mt-3 inline-block rounded-full border border-line px-3 py-1 text-xs text-muted">
+            Viewing sample dataset (fallback mode)
+          </p>
+        ) : null}
       </section>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
-import { isStale } from "@/lib/market";
+import { getSecurities, isStale } from "@/lib/market";
 
 export default async function SecuritiesPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const sp = await searchParams;
@@ -8,21 +7,12 @@ export default async function SecuritiesPage({ searchParams }: { searchParams: P
   const sector = typeof sp.sector === "string" ? sp.sector : "";
   const type = typeof sp.type === "string" ? sp.type : "";
 
-  const items = await prisma.security.findMany({
-    where: {
-      AND: [
-        q ? { OR: [{ symbol: { contains: q } }, { companyName: { contains: q } }] } : {},
-        sector ? { sector } : {},
-        type ? { securityType: type } : {}
-      ]
-    },
-    include: { prices: { orderBy: { tradeDate: "desc" }, take: 1 } },
-    orderBy: { symbol: "asc" }
-  });
+  const { items, sourceMode } = await getSecurities({ q, sector, type });
 
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-semibold">Securities Directory</h1>
+      {sourceMode === "fallback" ? <p className="text-xs text-muted">Showing sample records while database mode is unavailable.</p> : null}
       <form className="grid gap-2 md:grid-cols-4">
         <input name="q" defaultValue={q} placeholder="Symbol or company" className="rounded border border-line bg-panel p-2 text-sm" />
         <input name="sector" defaultValue={sector} placeholder="Sector" className="rounded border border-line bg-panel p-2 text-sm" />
@@ -34,7 +24,7 @@ export default async function SecuritiesPage({ searchParams }: { searchParams: P
           <thead className="bg-panel text-left text-muted"><tr><th className="p-3">Symbol</th><th>Company</th><th>Sector</th><th>Type</th><th>Latest close</th><th>Daily change</th><th>Volume</th><th>Status</th></tr></thead>
           <tbody>
             {items.map((s) => {
-              const latest = s.prices[0];
+              const latest = s.latest;
               return (
                 <tr key={s.id} className="border-t border-line">
                   <td className="p-3"><Link href={`/security/${s.symbol}`} className="font-semibold hover:text-accent">{s.symbol}</Link></td>

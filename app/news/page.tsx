@@ -1,16 +1,14 @@
-import { prisma } from "@/lib/prisma";
+import { getNews } from "@/lib/market";
 
 export default async function NewsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const sp = await searchParams;
   const q = typeof sp.q === "string" ? sp.q : "";
-  const items: any[] = await prisma.newsItem.findMany({
-    where: q ? { OR: [{ title: { contains: q } }, { issuerName: { contains: q } }] } : {},
-    orderBy: { publishedAt: "desc" }
-  });
+  const { items, sourceMode } = await getNews(q);
 
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-semibold">News</h1>
+      {sourceMode === "fallback" ? <p className="text-xs text-muted">Showing sample records while database mode is unavailable.</p> : null}
       <form><input name="q" defaultValue={q} placeholder="Search title or issuer" className="w-full rounded border border-line bg-panel p-2 text-sm" /></form>
       {items.length ? items.map((n) => (
         <article key={n.id} className="rounded-xl border border-line bg-panel p-4">

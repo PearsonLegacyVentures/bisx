@@ -1,30 +1,26 @@
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { LineChart } from "@/components/charts/line-chart";
-import { isStale } from "@/lib/market";
+import { getSecurityBySymbol, isStale } from "@/lib/market";
 
 export default async function SecurityPage({ params }: { params: Promise<{ symbol: string }> }) {
   const { symbol } = await params;
-  const security = await prisma.security.findUnique({
-    where: { symbol: symbol.toUpperCase() },
-    include: { prices: { orderBy: { tradeDate: "asc" } } }
-  });
-  if (!security) return notFound();
+  const data = await getSecurityBySymbol(symbol);
+  if (!data) return notFound();
 
+  const { security, news, filings, sourceMode } = data;
   const latest = security.prices.at(-1);
-  const news = await prisma.newsItem.findMany({ where: { securitySymbol: security.symbol }, orderBy: { publishedAt: "desc" }, take: 5 });
-  const filings = await prisma.filing.findMany({ where: { securitySymbol: security.symbol }, orderBy: { publishedAt: "desc" }, take: 5 });
 
   return (
     <div className="space-y-5">
       <header>
         <p className="text-xs text-muted">{security.securityType} · {security.sector ?? "Sector not set"}</p>
         <h1 className="text-3xl font-semibold">{security.symbol} — {security.companyName}</h1>
+        {sourceMode === "fallback" ? <p className="mt-2 text-xs text-muted">Using fallback sample data for this security.</p> : null}
       </header>
       <Card title="Latest quote">
         {latest ? (
-          <div className="grid gap-3 sm:grid-cols-4 text-sm">
+          <div className="grid gap-3 text-sm sm:grid-cols-4">
             <div><p className="text-muted">Latest available close</p><p className="text-xl font-semibold">{latest.close.toFixed(2)}</p></div>
             <div><p className="text-muted">Daily change</p><p className={(latest.changePercent ?? 0) >= 0 ? "text-success" : "text-danger"}>{latest.changePercent?.toFixed(2) ?? "—"}%</p></div>
             <div><p className="text-muted">Volume</p><p>{latest.volume?.toLocaleString() ?? "—"}</p></div>

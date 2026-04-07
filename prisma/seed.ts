@@ -18,8 +18,7 @@ async function main() {
       { securityId: s.id, tradeDate: new Date("2026-03-31"), close: 3.81, previousClose: 3.8, change: 0.01, changePercent: 0.26, volume: 11000, dividendYield: 3.6, sourceUrl: "https://bisxbahamas.com" },
       { securityId: s.id, tradeDate: new Date("2026-04-01"), close: 3.79, previousClose: 3.81, change: -0.02, changePercent: -0.52, volume: 9000, dividendYield: 3.6, sourceUrl: "https://bisxbahamas.com" },
       { securityId: s.id, tradeDate: new Date("2026-04-02"), close: 3.84, previousClose: 3.79, change: 0.05, changePercent: 1.32, volume: 12100, dividendYield: 3.7, sourceUrl: "https://bisxbahamas.com" }
-    ],
-    skipDuplicates: true
+    ]
   });
 
   await prisma.indexDaily.upsert({
