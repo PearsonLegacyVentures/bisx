@@ -1,0 +1,12 @@
+{
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "ignorePatterns": [
+    "src/components/**",
+    "src/pages/**",
+    "src/hooks/**",
+    "src/test/**",
+    "src/main.tsx",
+    "src/App.tsx",
+    "src/vite-env.d.ts"
+  ]
+}
