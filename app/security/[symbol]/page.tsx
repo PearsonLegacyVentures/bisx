@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { LineChart } from "@/components/charts/line-chart";
@@ -44,12 +43,12 @@ export default async function SecurityPage({ params }: { params: Promise<{ symbo
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card title="Recent news">{news.length ? news.map((n) => <Link key={n.id} href={n.sourceUrl} className="mb-2 block text-sm hover:text-accent">{n.title}</Link>) : <p className="text-sm text-muted">No issuer news currently indexed.</p>}</Card>
-        <Card title="Recent filings">{filings.length ? filings.map((f) => <Link key={f.id} href={f.documentUrl} className="mb-2 block text-sm hover:text-accent">{f.title}</Link>) : <p className="text-sm text-muted">No issuer filings currently indexed.</p>}</Card>
+        <Card title="Recent news">{news.length ? news.map((n) => <a key={n.id} href={n.sourceUrl} target="_blank" rel="noopener noreferrer" className="mb-2 block text-sm hover:text-accent">{n.title}</a>) : <p className="text-sm text-muted">No issuer news currently indexed.</p>}</Card>
+        <Card title="Recent filings">{filings.length ? filings.map((f) => <a key={f.id} href={f.documentUrl} target="_blank" rel="noopener noreferrer" className="mb-2 block text-sm hover:text-accent">{f.title}</a>) : <p className="text-sm text-muted">No issuer filings currently indexed.</p>}</Card>
       </div>
 
       <Card title="Source attribution">
-        <p className="text-sm text-muted">Primary source: <Link className="text-accent" href={security.sourceUrl}>{security.sourceUrl}</Link></p>
+        <p className="text-sm text-muted">Primary source: <a className="text-accent" href={security.sourceUrl} target="_blank" rel="noopener noreferrer">{security.sourceUrl}</a></p>
         <p className="mt-2 text-xs text-muted">This dashboard is informational only and is not investment advice.</p>
       </Card>
     </div>

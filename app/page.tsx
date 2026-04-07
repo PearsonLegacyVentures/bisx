@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { getDashboardData, isStale } from "@/lib/market";
 
@@ -54,16 +53,16 @@ export default async function HomePage() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Card title="Latest company news">
           {data.latestNews.map((n) => (
-            <Link key={n.id} href={n.sourceUrl} className="mb-3 block text-sm hover:text-accent">
+            <a key={n.id} href={n.sourceUrl} target="_blank" rel="noopener noreferrer" className="mb-3 block text-sm hover:text-accent">
               {n.title}
-            </Link>
+            </a>
           ))}
         </Card>
         <Card title="Latest filings / reports">
           {data.latestFilings.map((f) => (
-            <Link key={f.id} href={f.documentUrl} className="mb-3 block text-sm hover:text-accent">
+            <a key={f.id} href={f.documentUrl} target="_blank" rel="noopener noreferrer" className="mb-3 block text-sm hover:text-accent">
               {f.title}
-            </Link>
+            </a>
           ))}
         </Card>
       </div>
