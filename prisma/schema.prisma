@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Security {
+  id           Int       @id @default(autoincrement())
+  symbol       String    @unique
+  companyName  String
+  sector       String?
+  securityType String
+  isActive     Boolean   @default(true)
+  sourceUrl    String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  prices       DailyPrice[]
+
+  @@index([securityType])
+  @@index([sector])
+}
+
+model DailyPrice {
+  id            Int       @id @default(autoincrement())
+  securityId    Int
+  tradeDate     DateTime
+  close         Float
+  previousClose Float?
+  change        Float?
+  changePercent Float?
+  volume        Int?
+  eps           Float?
+  dividend      Float?
+  peRatio       Float?
+  dividendYield Float?
+  sourceUrl     String
+  importedAt    DateTime  @default(now())
+  security      Security  @relation(fields: [securityId], references: [id], onDelete: Cascade)
+
+  @@unique([securityId, tradeDate])
+  @@index([tradeDate])
+}
+
+model IndexDaily {
+  id            Int      @id @default(autoincrement())
+  tradeDate     DateTime
+  indexName     String
+  close         Float
+  pointChange   Float?
+  percentChange Float?
+  ytdPercent    Float?
+  sourceUrl     String
+  importedAt    DateTime @default(now())
+
+  @@unique([indexName, tradeDate])
+  @@index([tradeDate])
+}
+
+model NewsItem {
+  id             Int      @id @default(autoincrement())
+  title          String
+  slug           String   @unique
+  publishedAt    DateTime
+  issuerName     String?
+  securitySymbol String?
+  summary        String?
+  sourceUrl      String   @unique
+  importedAt     DateTime @default(now())
+
+  @@index([publishedAt])
+}
+
+model Filing {
+  id             Int      @id @default(autoincrement())
+  title          String
+  filingType     String
+  issuerName     String?
+  securitySymbol String?
+  publishedAt    DateTime
+  documentUrl    String
+  sourceUrl      String   @unique
+  importedAt     DateTime @default(now())
+
+  @@index([publishedAt])
+}
+
+model ImportLog {
+  id             Int      @id @default(autoincrement())
+  jobName        String
+  status         String
+  startedAt      DateTime
+  finishedAt     DateTime?
+  recordsCreated Int      @default(0)
+  recordsUpdated Int      @default(0)
+  message        String?
+}
